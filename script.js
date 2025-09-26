@@ -1,6 +1,7 @@
 const chatForm = document.getElementById('chatForm');
 const userInput = document.getElementById('chatInput');
 const chatBox = document.getElementById('chatBox');
+const uploadForm = document.getElementById('uploadForm');
 
 
 // Chat form submission handler
@@ -32,7 +33,7 @@ chatForm.addEventListener('submit', async function(e) {
 });
 
 // File upload form submission handler
-document.getElementById('upload-form').addEventListener('submit', async (e) => {
+uploadForm.addEventListener('submit', async (e) => {
   e.preventDefault();
   const input = document.getElementById('fileInput');
   const files = input ? input.files : null;
