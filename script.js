@@ -1,6 +1,6 @@
-const chatForm = document.getElementById('chat-form');
-const userInput = document.getElementById('user-input');
-const chatBox = document.getElementById('chat-box');
+const chatForm = document.getElementById('chatForm');
+const userInput = document.getElementById('chatInput');
+const chatBox = document.getElementById('chatBox');
 
 
 // Chat form submission handler
@@ -15,7 +15,7 @@ chatForm.addEventListener('submit', async function(e) {
   // Simulate AI response (replace with actual API call)
   try {
     console.log('Sending chat...');
-    const response = await fetch('http://localhost:7129/api/SubmitChat', {
+    const response = await fetch('https://ocdefonblobupload-ffcwb6frd2gnd0f8.westus2-01.azurewebsites.net/api/SubmitChat?code=zFqYyoEA4aObdFx_IyNtzSMFTLVbrcTypZCRThzIC_anAzFu1xu3iw==', {
       method: 'POST',
       body: JSON.stringify({ message }),
       headers: {
@@ -50,7 +50,7 @@ document.getElementById('upload-form').addEventListener('submit', async (e) => {
 
   try {
     console.log('Uploading files...');
-    const response = await fetch('http://localhost:7129/api/UploadPDF', {
+    const response = await fetch('https://ocdefonblobupload-ffcwb6frd2gnd0f8.westus2-01.azurewebsites.net/api/UploadPDF?code=dc4riUFRUGw4j0b0W2V1J-JivxH-iPresSi49yoMryNlAzFuumATfg==', {
       method: 'POST',
       body: formData
     });
