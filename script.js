@@ -1,3 +1,12 @@
+// Generate a unique session ID
+function generateSessionId() {
+  return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
+}
+
+// Create session ID for this session
+const sessionId = generateSessionId();
+console.log('Session ID:', sessionId);
+
 const chatForm = document.getElementById('chatForm');
 const userInput = document.getElementById('chatInput');
 const chatBox = document.getElementById('chatBox');
@@ -17,8 +26,9 @@ chatForm.addEventListener('submit', async function(e) {
   try {
     console.log('Sending chat...');
     const response = await fetch('https://ocdefonblobupload-ffcwb6frd2gnd0f8.westus2-01.azurewebsites.net/api/SubmitChat?code=zFqYyoEA4aObdFx_IyNtzSMFTLVbrcTypZCRThzIC_anAzFu1xu3iw==', {
+    //const response = await fetch('http://localhost:7129/api/SubmitChat', {
       method: 'POST',
-      body: JSON.stringify({ message }),
+      body: JSON.stringify({ Message: message, SessionId: sessionId }),
       headers: {
         'Content-Type': 'application/json'
       }
