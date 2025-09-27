@@ -26,7 +26,7 @@ chatForm.addEventListener('submit', async function(e) {
   try {
     console.log('Sending chat...');
     const response = await fetch('https://ocdefonblobupload-ffcwb6frd2gnd0f8.westus2-01.azurewebsites.net/api/SubmitChat?code=zFqYyoEA4aObdFx_IyNtzSMFTLVbrcTypZCRThzIC_anAzFu1xu3iw==', {
-    //const response = await fetch('http://localhost:7129/api/SubmitChat', {
+    // const response = await fetch('http://localhost:7129/api/SubmitChat', {
       method: 'POST',
       body: JSON.stringify({ Message: message, SessionId: sessionId }),
       headers: {
@@ -78,12 +78,19 @@ uploadForm.addEventListener('submit', async (e) => {
 function appendMessage(sender, text) {
   const msgDiv = document.createElement('div');
   msgDiv.classList.add('message', sender);
+  
   // Add sender label before the message
   const senderLabel = document.createElement('span');
   senderLabel.className = 'sender-label';
   senderLabel.textContent = (sender === 'user' ? 'User: ' : 'Bot: ');
   msgDiv.appendChild(senderLabel);
-  msgDiv.appendChild(document.createTextNode(text));
+  
+  // Create message content container that supports HTML
+  const messageContent = document.createElement('span');
+  messageContent.className = 'message-content';
+  messageContent.innerHTML = text; // Use innerHTML to render HTML tags
+  msgDiv.appendChild(messageContent);
+  
   chatBox.appendChild(msgDiv);
   chatBox.scrollTop = chatBox.scrollHeight;
 }
