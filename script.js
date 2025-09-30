@@ -169,19 +169,7 @@ function appendMessage(sender, text) {
   const msgDiv = document.createElement('div');
   msgDiv.classList.add('message', sender);
 
-  // Avatar
-  const avatar = document.createElement('div');
-  avatar.className = 'avatar';
-  if (sender === 'user') {
-    avatar.textContent = '🧑';
-  } else if (sender === 'bot') {
-    avatar.textContent = '🤖';
-  } else {
-    avatar.textContent = '💬';
-  }
-  msgDiv.appendChild(avatar);
-
-  // Bubble
+  // Bubble only, no avatar
   const bubble = document.createElement('div');
   bubble.className = 'bubble';
   bubble.innerHTML = text;
