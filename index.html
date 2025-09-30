@@ -52,34 +52,73 @@
         .message {
             margin-bottom: 18px;
             display: flex;
-            flex-direction: column;
+            align-items: flex-end;
+            gap: 10px;
+            opacity: 0;
+            transform: translateY(20px);
+            animation: fadeInUp 0.5s cubic-bezier(.23,1.02,.64,1) forwards;
         }
 
-            .message.user .bubble {
-                align-self: flex-end;
-                background: #374151;
-                color: #ffffff;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-                border: 1px solid rgba(75, 85, 99, 0.5);
+        @keyframes fadeInUp {
+            to {
+                opacity: 1;
+                transform: none;
             }
+        }
 
-            .message.bot .bubble {
-                align-self: flex-start;
-                background: #1f2937;
-                color: #f3f4f6;
-                box-shadow: 0 4px 12px rgba(0,0,0,0.2);
-                border: 1px solid rgba(75, 85, 99, 0.3);
-            }
+        .message.user {
+            flex-direction: row-reverse;
+        }
+        .message.bot {
+            flex-direction: row;
+        }
+
+        .avatar {
+            width: 38px;
+            height: 38px;
+            border-radius: 50%;
+            background: linear-gradient(135deg, #ffd700 0%, #f3f4f6 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 1.3rem;
+            font-weight: 700;
+            color: #232a47;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.10);
+            border: 2px solid #fffbe6;
+        }
+        .message.user .avatar {
+            background: linear-gradient(135deg, #6366f1 0%, #a5b4fc 100%);
+            color: #fff;
+            border: 2px solid #e0e7ff;
+        }
 
         .bubble {
             max-width: 80%;
-            padding: 14px 18px;
-            border-radius: 18px;
-            margin-bottom: 4px;
-            font-size: 1rem;
+            padding: 16px 22px;
+            border-radius: 20px 20px 20px 6px;
+            margin-bottom: 2px;
+            font-size: 1.08rem;
             word-break: break-word;
             font-weight: 500;
-            line-height: 1.5;
+            line-height: 1.6;
+            box-shadow: 0 2px 12px rgba(0,0,0,0.13);
+            background: linear-gradient(120deg, #232a47 60%, #1f2937 100%);
+            color: #f3f4f6;
+            border: 1.5px solid rgba(75, 85, 99, 0.22);
+            transition: background 0.3s;
+        }
+        .message.user .bubble {
+            background: linear-gradient(120deg, #6366f1 60%, #818cf8 100%);
+            color: #fff;
+            border-radius: 20px 20px 6px 20px;
+            border: 1.5px solid #a5b4fc;
+        }
+        .message.bot .bubble {
+            background: linear-gradient(120deg, #232a47 60%, #1f2937 100%);
+            color: #ffd700;
+            border-radius: 20px 20px 20px 6px;
+            border: 1.5px solid #ffd70044;
         }
 
         .chat-input-row {
@@ -218,7 +257,9 @@
         <div class="chat-box" id="chatBox"></div>
         <form id="chatForm" class="chat-input-row" autocomplete="off">
             <input type="text" id="chatInput" class="chat-input" placeholder="Type your question..." required />
-            <button type="submit" class="send-btn" id="sendBtn">Send</button>
+            <button type="submit" class="send-btn" id="sendBtn">
+                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+            </button>
         </form>
         <form id="uploadForm" class="upload-form" enctype="multipart/form-data">
             <label for="fileInput">Upload PDF(s):</label>

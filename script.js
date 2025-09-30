@@ -168,19 +168,25 @@ uploadForm.addEventListener('submit', async (e) => {
 function appendMessage(sender, text) {
   const msgDiv = document.createElement('div');
   msgDiv.classList.add('message', sender);
-  
-  // Add sender label before the message
-  const senderLabel = document.createElement('span');
-  senderLabel.className = 'sender-label';
-  senderLabel.textContent = (sender === 'user' ? 'User: ' : 'Bot: ');
-  msgDiv.appendChild(senderLabel);
-  
-  // Create message content container that supports HTML
-  const messageContent = document.createElement('span');
-  messageContent.className = 'message-content';
-  messageContent.innerHTML = text; // Use innerHTML to render HTML tags
-  msgDiv.appendChild(messageContent);
-  
+
+  // Avatar
+  const avatar = document.createElement('div');
+  avatar.className = 'avatar';
+  if (sender === 'user') {
+    avatar.textContent = '🧑';
+  } else if (sender === 'bot') {
+    avatar.textContent = '🤖';
+  } else {
+    avatar.textContent = '💬';
+  }
+  msgDiv.appendChild(avatar);
+
+  // Bubble
+  const bubble = document.createElement('div');
+  bubble.className = 'bubble';
+  bubble.innerHTML = text;
+  msgDiv.appendChild(bubble);
+
   chatBox.appendChild(msgDiv);
   chatBox.scrollTop = chatBox.scrollHeight;
 }
