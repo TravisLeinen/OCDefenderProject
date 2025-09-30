@@ -1,15 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Law Proceedings Assistant</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
-    <!-- Marked.js for Markdown rendering -->
-    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
-    <style>
         body {
             font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: linear-gradient(135deg, #1f2937 0%, #374151 100%);
+            background: #343541;
             margin: 0;
             padding: 0;
             min-height: 100vh;
@@ -18,30 +9,37 @@
         .container {
             max-width: 800px;
             margin: 40px auto;
-            background: rgba(31, 41, 55, 0.95);
-            backdrop-filter: blur(10px);
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(75, 85, 99, 0.3);
-            padding: 40px 32px;
-            border: 1px solid rgba(75, 85, 99, 0.3);
+            background: #444654;
+            border-radius: 16px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.25);
+            padding: 40px 24px 24px 24px;
+            border: 1.5px solid #202123;
         }
 
         h1 {
             text-align: center;
-            color: #d4af37;
-            font-size: 2.5rem;
+            color: #ececf1;
+            font-size: 2.2rem;
             font-weight: 700;
-            margin-bottom: 32px;
-            letter-spacing: -0.02em;
-            text-shadow: 0 2px 4px rgba(0,0,0,0.3);
+            margin-bottom: 28px;
+            letter-spacing: -0.01em;
+            text-shadow: 0 2px 8px #23232b33;
         }
 
         .chat-box {
-            border: 1px solid rgba(75, 85, 99, 0.3);
-            border-radius: 16px;
-            background: rgba(17, 24, 39, 0.8);
-            backdrop-filter: blur(8px);
-            height: 400px;
+            border: none;
+            border-radius: 12px;
+            background: #343541;
+            height: 420px;
+            overflow-y: auto;
+            padding: 24px 12px 12px 12px;
+            margin-bottom: 24px;
+            box-shadow: 0 2px 12px #23232b22 inset;
+            color: #ececf1;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem;
+        }
             overflow-y: auto;
             padding: 20px;
             margin-bottom: 24px;
@@ -74,51 +72,49 @@
         }
 
         .avatar {
-            width: 38px;
-            height: 38px;
+            width: 36px;
+            height: 36px;
             border-radius: 50%;
-            background: linear-gradient(135deg, #ffd700 0%, #f3f4f6 100%);
+            background: #ececf1;
             display: flex;
             align-items: center;
             justify-content: center;
-            font-size: 1.3rem;
+            font-size: 1.2rem;
             font-weight: 700;
-            color: #232a47;
-            box-shadow: 0 2px 8px rgba(0,0,0,0.10);
-            border: 2px solid #fffbe6;
+            color: #343541;
+            box-shadow: 0 2px 8px #23232b11;
+            border: 2px solid #ececf1;
         }
         .message.user .avatar {
-            background: linear-gradient(135deg, #6366f1 0%, #a5b4fc 100%);
+            background: #19c37d;
             color: #fff;
-            border: 2px solid #e0e7ff;
+            border: 2px solid #19c37d;
         }
 
         .bubble {
             max-width: 80%;
             padding: 16px 22px;
-            border-radius: 20px 20px 20px 6px;
+            border-radius: 12px;
             margin-bottom: 2px;
             font-size: 1.08rem;
             word-break: break-word;
             font-weight: 500;
             line-height: 1.6;
-            box-shadow: 0 2px 12px rgba(0,0,0,0.13);
-            background: linear-gradient(120deg, #232a47 60%, #1f2937 100%);
-            color: #f3f4f6;
-            border: 1.5px solid rgba(75, 85, 99, 0.22);
+            box-shadow: 0 2px 12px #23232b11;
+            background: #444654;
+            color: #ececf1;
+            border: none;
             transition: background 0.3s;
         }
         .message.user .bubble {
-            background: linear-gradient(120deg, #6366f1 60%, #818cf8 100%);
-            color: #fff;
-            border-radius: 20px 20px 6px 20px;
-            border: 1.5px solid #a5b4fc;
+            background: #ececf1;
+            color: #23232b;
+            border-radius: 12px 12px 4px 12px;
         }
         .message.bot .bubble {
-            background: linear-gradient(120deg, #232a47 60%, #1f2937 100%);
-            color: #ffd700;
-            border-radius: 20px 20px 20px 6px;
-            border: 1.5px solid #ffd70044;
+            background: #444654;
+            color: #19c37d;
+            border-radius: 12px 12px 12px 4px;
         }
 
         .chat-input-row {
