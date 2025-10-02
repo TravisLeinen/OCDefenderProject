@@ -129,6 +129,8 @@ uploadForm.addEventListener('submit', async (e) => {
     });
 
     const result = await response.text();
+
+    // TODO: Handle result failures
     
     // Remove loading message
     const loadingMsg = document.getElementById(loadingMessageId);
@@ -139,8 +141,6 @@ uploadForm.addEventListener('submit', async (e) => {
     // Show successful upload message with file list
     const successFileListHtml = fileNames.map(name => `<li style="margin: 2px 0; color: #10b981;">${name}</li>`).join('');
     appendMessage("System", `<div style="color: #10b981; font-weight: 500;">✅ Successfully uploaded ${files.length} file${files.length > 1 ? 's' : ''}:</div><ul style="margin: 4px 0 0 16px; padding: 0; list-style-type: disc;">${successFileListHtml}</ul>`);
-    
-    appendMessage("ChatBot", result);
     
     // Clear the file input after successful upload
     input.value = '';
