@@ -3,11 +3,82 @@ function generateSessionId() {
   return 'session_' + Date.now() + '_' + Math.random().toString(36).substr(2, 9);
 }
 
-// Create session ID for this session
+// Chat management system for multiple chats within a case
+class ChatManager {
+  constructor() {
+    this.chats = new Map();
+    this.activeChatId = null;
+    this.currentCaseNumber = '';
+  }
+
+  createChat(chatName = null) {
+    const chatId = generateSessionId();
+    const chat = {
+      id: chatId,
+      name: chatName || `Chat ${this.chats.size + 1}`,
+      messages: [],
+      createdAt: new Date()
+    };
+    this.chats.set(chatId, chat);
+    console.log('Created new chat:', chatId, 'Name:', chat.name);
+    return chatId;
+  }
+
+  setActiveChat(chatId) {
+    if (this.chats.has(chatId)) {
+      this.activeChatId = chatId;
+      console.log('Switched to chat:', chatId);
+      return true;
+    }
+    return false;
+  }
+
+  getActiveChat() {
+    return this.chats.get(this.activeChatId);
+  }
+
+  getAllChats() {
+    return Array.from(this.chats.values());
+  }
+
+  removeChat(chatId) {
+    this.chats.delete(chatId);
+    if (this.activeChatId === chatId) {
+      // Switch to another chat if available
+      const remainingChats = this.getAllChats();
+      this.activeChatId = remainingChats.length > 0 ? remainingChats[0].id : null;
+    }
+  }
+
+  clearAllChats() {
+    this.chats.clear();
+    this.activeChatId = null;
+    console.log('Cleared all chats for case switch');
+  }
+
+  addMessageToChat(chatId, sender, message) {
+    const chat = this.chats.get(chatId);
+    if (chat) {
+      chat.messages.push({
+        sender: sender,
+        message: message,
+        timestamp: new Date()
+      });
+    }
+  }
+
+  setCaseNumber(caseNumber) {
+    this.currentCaseNumber = caseNumber;
+  }
+}
+
+// Initialize chat manager
+const chatManager = new ChatManager();
+
+// Legacy variables for backward compatibility
 let sessionId = generateSessionId();
 console.log('Session ID:', sessionId);
 
-// Global variable to store current case number
 let currentCaseNumber = '';
 
 // DOM elements
@@ -42,29 +113,45 @@ caseEntryForm.addEventListener('submit', function(e) {
   
   // Store the case number
   currentCaseNumber = caseNumber;
+  chatManager.setCaseNumber(caseNumber);
+  
+  // Create the first chat for this case
+  const firstChatId = chatManager.createChat('Main Chat');
+  chatManager.setActiveChat(firstChatId);
+  sessionId = firstChatId;
   
   // Update the case info display
   currentCaseNumberSpan.textContent = caseNumber;
   caseInfo.classList.add('show');
   
+  // Update chat tabs
+  updateChatTabs();
+  
   // Hide case entry screen and show main app
   caseEntryScreen.style.display = 'none';
   mainApp.classList.add('active');
   
-  // Focus on chat input
+  // Clear chat box and focus on chat input
+  clearChatBox();
   userInput.focus();
   
-  console.log('Case number set:', caseNumber);
+  console.log('Case number set:', caseNumber, 'First chat created:', firstChatId);
 });
 
 // Function to switch case numbers
 function switchCaseNumber() {
+  // Clear all chats when switching cases
+  chatManager.clearAllChats();
+  
   // Generate new session ID for the new case
   sessionId = generateSessionId();
   console.log('New Session ID:', sessionId);
   
   // Reset the form
   caseNumberInput.value = '';
+  
+  // Clear chat box
+  clearChatBox();
   
   // Hide main app and show case entry screen
   mainApp.classList.remove('active');
@@ -73,7 +160,7 @@ function switchCaseNumber() {
   // Focus on case number input
   caseNumberInput.focus();
   
-  console.log('Switching case number');
+  console.log('Switching case number - all chats cleared');
 }
 
 
@@ -82,6 +169,15 @@ chatForm.addEventListener('submit', async function(e) {
   e.preventDefault();
   const message = userInput.value.trim();
   if (message === '') return;
+
+  // Ensure we have an active chat
+  if (!chatManager.activeChatId) {
+    alert('Please create a chat first.');
+    return;
+  }
+
+  // Update session ID to active chat ID
+  sessionId = chatManager.activeChatId;
 
   appendMessage('user', message);
   userInput.value = '';
@@ -155,6 +251,12 @@ uploadForm.addEventListener('submit', async (e) => {
 
   if (!files || files.length === 0) {
     alert('No files selected');
+    return;
+  }
+
+  // Ensure we have an active chat
+  if (!chatManager.activeChatId) {
+    alert('Please create a chat first.');
     return;
   }
 
@@ -242,5 +344,119 @@ function appendMessage(sender, text) {
   msgDiv.appendChild(bubble);
 
   chatBox.appendChild(msgDiv);
+  chatBox.scrollTop = chatBox.scrollHeight;
+  
+  // Store message in active chat
+  if (chatManager.activeChatId) {
+    chatManager.addMessageToChat(chatManager.activeChatId, sender, text);
+  }
+}
+
+// Chat management UI functions
+function updateChatTabs() {
+  const tabsList = document.getElementById('chatTabsList');
+  if (!tabsList) return;
+  
+  tabsList.innerHTML = '';
+  
+  const chats = chatManager.getAllChats();
+  chats.forEach(chat => {
+    const tab = document.createElement('div');
+    tab.className = `chat-tab ${chat.id === chatManager.activeChatId ? 'active' : ''}`;
+    tab.innerHTML = `
+      <span title="Chat: ${chat.name}">${chat.name}</span>
+      <button class="chat-tab-close" onclick="closeChat('${chat.id}')" title="Close chat">
+        <svg width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <line x1="18" y1="6" x2="6" y2="18"></line>
+          <line x1="6" y1="6" x2="18" y2="18"></line>
+        </svg>
+      </button>
+    `;
+    
+    tab.onclick = (e) => {
+      if (!e.target.closest('.chat-tab-close')) {
+        switchToChat(chat.id);
+      }
+    };
+    
+    tabsList.appendChild(tab);
+  });
+}
+
+function createNewChat() {
+  const chatName = `Chat ${chatManager.getAllChats().length + 1}`;
+  const newChatId = chatManager.createChat(chatName);
+  chatManager.setActiveChat(newChatId);
+  sessionId = newChatId;
+  
+  // Update UI
+  updateChatTabs();
+  clearChatBox();
+  
+  // Focus on chat input
+  userInput.focus();
+  
+  console.log('Created new chat:', newChatId, 'Name:', chatName);
+}
+
+function switchToChat(chatId) {
+  const chat = chatManager.chats.get(chatId);
+  if (!chat) return;
+  
+  chatManager.setActiveChat(chatId);
+  sessionId = chatId;
+  
+  // Update UI
+  updateChatTabs();
+  
+  // Clear and load chat history
+  clearChatBox();
+  loadChatHistory(chatId);
+  
+  console.log('Switched to chat:', chatId, 'Name:', chat.name);
+}
+
+function closeChat(chatId) {
+  if (chatManager.chats.size <= 1) {
+    alert('Cannot close the last chat. Please create a new chat first.');
+    return;
+  }
+  
+  chatManager.removeChat(chatId);
+  
+  // If we closed the active chat, switch to another one
+  if (chatManager.activeChatId) {
+    const activeChat = chatManager.getActiveChat();
+    if (activeChat) {
+      switchToChat(activeChat.id);
+    }
+  } else {
+    // No chats left, create a new one
+    createNewChat();
+  }
+  
+  updateChatTabs();
+}
+
+function clearChatBox() {
+  chatBox.innerHTML = '';
+}
+
+function loadChatHistory(chatId) {
+  const chat = chatManager.chats.get(chatId);
+  if (!chat) return;
+  
+  chat.messages.forEach(msg => {
+    const msgDiv = document.createElement('div');
+    msgDiv.classList.add('message', msg.sender);
+
+    const bubble = document.createElement('div');
+    bubble.className = 'bubble';
+    bubble.innerHTML = msg.message;
+    msgDiv.appendChild(bubble);
+
+    chatBox.appendChild(msgDiv);
+  });
+  
   chatBox.scrollTop = chatBox.scrollHeight;
 }
