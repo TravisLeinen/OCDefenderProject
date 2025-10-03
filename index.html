@@ -4,224 +4,62 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Writs and Appeals Assistant</title>
-    <style>
-        body {
-            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: #343541;
-            margin: 0;
-            padding: 0;
-            min-height: 100vh;
-        }
-        .container {
-            max-width: 800px;
-            margin: 40px auto;
-            background: #444654;
-            border-radius: 16px;
-            box-shadow: 0 8px 32px rgba(0,0,0,0.25);
-            padding: 40px 24px 24px 24px;
-            border: 1.5px solid #202123;
-        }
-        h1 {
-            text-align: center;
-            color: #ececf1;
-            font-size: 2.2rem;
-            font-weight: 700;
-            margin-bottom: 28px;
-            letter-spacing: -0.01em;
-            text-shadow: 0 2px 8px #23232b33;
-        }
-        .chat-box {
-            border: none;
-            border-radius: 12px;
-            background: #343541;
-            height: 420px;
-            overflow-y: auto;
-            padding: 24px 12px 12px 12px;
-            margin-bottom: 24px;
-            box-shadow: 0 2px 12px #23232b22 inset;
-            color: #ececf1;
-            display: flex;
-            flex-direction: column;
-            gap: 0.5rem;
-        }
-        .message {
-            margin-bottom: 18px;
-            display: flex;
-            align-items: flex-end;
-            gap: 10px;
-            opacity: 0;
-            transform: translateY(20px);
-            animation: fadeInUp 0.5s cubic-bezier(.23,1.02,.64,1) forwards;
-        }
-        @keyframes fadeInUp {
-            to {
-                opacity: 1;
-                transform: none;
-            }
-        }
-        .message.user {
-            flex-direction: row-reverse;
-        }
-        .message.bot {
-            flex-direction: row;
-        }
-        /* Avatars removed as per user request */
-        .bubble {
-            max-width: 80%;
-            padding: 16px 22px;
-            border-radius: 12px;
-            margin-bottom: 2px;
-            font-size: 1.08rem;
-            word-break: break-word;
-            font-weight: 500;
-            line-height: 1.6;
-            box-shadow: 0 2px 12px #23232b11;
-            background: #444654;
-            color: #ececf1;
-            border: none;
-            transition: background 0.3s;
-        }
-        .message.user .bubble {
-            background: #ececf1;
-            color: #23232b;
-            border-radius: 12px 12px 4px 12px;
-        }
-        .message.bot .bubble {
-            background: #444654;
-            color: #fff;
-            border-radius: 12px 12px 12px 4px;
-        }
-        .chat-input-row {
-            display: flex;
-            gap: 8px;
-        }
-        .chat-input {
-            flex: 1;
-            padding: 14px 16px;
-            border-radius: 12px;
-            border: 2px solid rgba(75, 85, 99, 0.4);
-            font-size: 1rem;
-            background: rgba(17, 24, 39, 0.9);
-            color: #f9fafb;
-            transition: all 0.3s ease;
-            outline: none;
-        }
-        .chat-input:focus {
-            border-color: #6b7280;
-            box-shadow: 0 0 0 3px rgba(107, 114, 128, 0.2);
-            background: #1f2937;
-        }
-        .chat-input::placeholder {
-            color: #9ca3af;
-        }
-        .send-btn {
-            background: #374151;
-            color: #f9fafb;
-            border: 1px solid rgba(75, 85, 99, 0.5);
-            border-radius: 12px;
-            padding: 14px 24px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-        .send-btn:hover:not(:disabled) {
-            background: #4b5563;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-        }
-        .send-btn:disabled {
-            background: #374151;
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        .upload-form {
-            margin-top: 32px;
-            display: flex;
-            align-items: center;
-            gap: 16px;
-            background: rgba(17, 24, 39, 0.7);
-            backdrop-filter: blur(8px);
-            padding: 20px 24px;
-            border-radius: 16px;
-            border: 1px solid rgba(75, 85, 99, 0.3);
-            box-shadow: 0 8px 24px rgba(0,0,0,0.2);
-        }
-        .upload-form label {
-            font-weight: 600;
-            color: #e5e7eb;
-            font-size: 1rem;
-        }
-        .upload-form input[type="file"] {
-            font-size: 0.95rem;
-            padding: 8px 12px;
-            border-radius: 8px;
-            border: 1px solid rgba(75, 85, 99, 0.4);
-            background: #1f2937;
-            color: #f9fafb;
-        }
-        .upload-form input[type="file"]::file-selector-button {
-            background: #374151;
-            color: #f9fafb;
-            border: 1px solid rgba(75, 85, 99, 0.4);
-            border-radius: 6px;
-            padding: 6px 12px;
-            margin-right: 12px;
-            cursor: pointer;
-        }
-        .upload-btn {
-            background: #1f2937;
-            color: #f9fafb;
-            border: 1px solid rgba(75, 85, 99, 0.5);
-            border-radius: 10px;
-            padding: 12px 20px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-        .upload-btn:hover:not(:disabled) {
-            background: #374151;
-            transform: translateY(-2px);
-            box-shadow: 0 6px 20px rgba(0,0,0,0.4);
-        }
-        .upload-btn:disabled {
-            background: #1f2937;
-            opacity: 0.5;
-            cursor: not-allowed;
-            transform: none;
-            box-shadow: none;
-        }
-        @media (max-width: 600px) {
-            .container {
-                padding: 12px;
-            }
-            .chat-box {
-                height: 250px;
-            }
-        }
-    </style>
-    </style>
+    <link rel="stylesheet" href="style.css">
 </head>
 <body>
-    <div class="container">
-        <h1>Writs and Appeals Assistant</h1>
-        <div class="chat-box" id="chatBox"></div>
-        <form id="chatForm" class="chat-input-row" autocomplete="off">
-            <input type="text" id="chatInput" class="chat-input" placeholder="Type your question..." required />
-            <button type="submit" class="send-btn" id="sendBtn">
-                <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-            </button>
-        </form>
-        <form id="uploadForm" class="upload-form" enctype="multipart/form-data">
-            <label for="fileInput">Upload PDF(s):</label>
-            <input type="file" id="fileInput" name="file" accept="application/pdf" multiple required />
-            <button type="submit" class="upload-btn" id="uploadBtn">Upload</button>
-        </form>
+    <!-- Case Number Entry Screen -->
+    <div id="caseEntryScreen" class="case-entry-screen">
+        <div class="case-entry-container">
+            <h1 class="case-entry-title">Writs and Appeals Assistant</h1>
+            <p class="case-entry-subtitle">Please enter a case number to begin working on your legal documents and research.</p>
+            
+            <form id="caseEntryForm">
+                <div class="case-input-group">
+                    <label for="caseNumberInput" class="case-input-label">Case Number</label>
+                    <input 
+                        type="text" 
+                        id="caseNumberInput" 
+                        class="case-input" 
+                        placeholder="e.g., 2024-CV-001234" 
+                        required 
+                        pattern="[A-Za-z0-9\-]+"
+                        title="Case number should contain only letters, numbers, and hyphens"
+                    />
+                </div>
+                <button type="submit" class="case-submit-btn" id="caseSubmitBtn">Enter Case</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- Main Application (initially hidden) -->
+    <div id="mainApp" class="main-app">
+        <div class="container">
+            <div class="case-info" id="caseInfo">
+                <div class="case-info-content">
+                    <strong>Working on Case:</strong> <span id="currentCaseNumber"></span>
+                </div>
+                <button type="button" class="switch-case-btn" onclick="switchCaseNumber()" title="Switch to a different case">
+                    <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M3 12l9-9 9 9"></path>
+                        <path d="M3 21l9-9 9 9"></path>
+                    </svg>
+                    Switch Case
+                </button>
+            </div>
+            <h1>Writs and Appeals Assistant</h1>
+            <div class="chat-box" id="chatBox"></div>
+            <form id="chatForm" class="chat-input-row" autocomplete="off">
+                <input type="text" id="chatInput" class="chat-input" placeholder="Type your question..." required />
+                <button type="submit" class="send-btn" id="sendBtn">
+                    <svg width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-send"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
+                </button>
+            </form>
+            <form id="uploadForm" class="upload-form" enctype="multipart/form-data">
+                <label for="fileInput">Upload PDF(s):</label>
+                <input type="file" id="fileInput" name="file" accept="application/pdf" multiple required />
+                <button type="submit" class="upload-btn" id="uploadBtn">Upload</button>
+            </form>
+        </div>
     </div>
     <script src="script.js"></script>
 </body>

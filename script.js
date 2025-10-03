@@ -4,13 +4,77 @@ function generateSessionId() {
 }
 
 // Create session ID for this session
-const sessionId = generateSessionId();
+let sessionId = generateSessionId();
 console.log('Session ID:', sessionId);
+
+// Global variable to store current case number
+let currentCaseNumber = '';
+
+// DOM elements
+const caseEntryScreen = document.getElementById('caseEntryScreen');
+const mainApp = document.getElementById('mainApp');
+const caseEntryForm = document.getElementById('caseEntryForm');
+const caseNumberInput = document.getElementById('caseNumberInput');
+const caseSubmitBtn = document.getElementById('caseSubmitBtn');
+const caseInfo = document.getElementById('caseInfo');
+const currentCaseNumberSpan = document.getElementById('currentCaseNumber');
 
 const chatForm = document.getElementById('chatForm');
 const userInput = document.getElementById('chatInput');
 const chatBox = document.getElementById('chatBox');
 const uploadForm = document.getElementById('uploadForm');
+
+// Case number entry handler
+caseEntryForm.addEventListener('submit', function(e) {
+  e.preventDefault();
+  const caseNumber = caseNumberInput.value.trim();
+  
+  if (caseNumber === '') {
+    alert('Please enter a case number');
+    return;
+  }
+  
+  // Validate case number format (basic validation)
+  if (!/^[A-Za-z0-9\-]+$/.test(caseNumber)) {
+    alert('Case number should contain only letters, numbers, and hyphens');
+    return;
+  }
+  
+  // Store the case number
+  currentCaseNumber = caseNumber;
+  
+  // Update the case info display
+  currentCaseNumberSpan.textContent = caseNumber;
+  caseInfo.classList.add('show');
+  
+  // Hide case entry screen and show main app
+  caseEntryScreen.style.display = 'none';
+  mainApp.classList.add('active');
+  
+  // Focus on chat input
+  userInput.focus();
+  
+  console.log('Case number set:', caseNumber);
+});
+
+// Function to switch case numbers
+function switchCaseNumber() {
+  // Generate new session ID for the new case
+  sessionId = generateSessionId();
+  console.log('New Session ID:', sessionId);
+  
+  // Reset the form
+  caseNumberInput.value = '';
+  
+  // Hide main app and show case entry screen
+  mainApp.classList.remove('active');
+  caseEntryScreen.style.display = 'flex';
+  
+  // Focus on case number input
+  caseNumberInput.focus();
+  
+  console.log('Switching case number');
+}
 
 
 // Chat form submission handler
@@ -42,7 +106,7 @@ chatForm.addEventListener('submit', async function(e) {
     const response = await fetch('https://ocdefonblobupload-ffcwb6frd2gnd0f8.westus2-01.azurewebsites.net/api/SubmitChat?code=zFqYyoEA4aObdFx_IyNtzSMFTLVbrcTypZCRThzIC_anAzFu1xu3iw==', {
     // const response = await fetch('http://localhost:7129/api/SubmitChat', {
       method: 'POST',
-      body: JSON.stringify({ Message: message, SessionId: sessionId }),
+      body: JSON.stringify({ Message: message, SessionId: sessionId, CaseNumber: currentCaseNumber }),
       headers: {
         'Content-Type': 'application/json'
       }
@@ -95,6 +159,8 @@ uploadForm.addEventListener('submit', async (e) => {
   }
 
   const formData = new FormData();
+  // Append case number
+  formData.append('caseNumber', currentCaseNumber);
   // Append all selected files. Use 'files[]' so server frameworks treat them as an array.
   for (let i = 0; i < files.length; i++) {
     formData.append('files[]', files[i], files[i].name);
