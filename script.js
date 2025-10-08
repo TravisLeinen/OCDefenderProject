@@ -485,12 +485,11 @@ async function loadFileList() {
 
   try {
     console.log('Loading file list for case:', currentCaseNumber);
-    const response = await fetch('https://ocdefonblobupload-ffcwb6frd2gnd0f8.westus2-01.azurewebsites.net/api/ListFiles?code=ZeI5vyYITMvYPiyMwU7t33vxG20sgCPQcnv0z684uoabAzFulc6rxg==', {
-      method: 'POST',
+    const response = await fetch(`https://ocdefonblobupload-ffcwb6frd2gnd0f8.westus2-01.azurewebsites.net/api/ListFiles?code=ZeI5vyYITMvYPiyMwU7t33vxG20sgCPQcnv0z684uoabAzFulc6rxg==&CaseNumber=${encodeURIComponent(currentCaseNumber)}`, {
+      method: 'GET',
       headers: {
         'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({ CaseNumber: currentCaseNumber })
+      }
     });
 
     if (!response.ok) {
