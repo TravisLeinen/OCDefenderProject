@@ -135,6 +135,9 @@ caseEntryForm.addEventListener('submit', function(e) {
   clearChatBox();
   userInput.focus();
   
+  // Load file list for this case
+  loadFileList();
+  
   console.log('Case number set:', caseNumber, 'First chat created:', firstChatId);
 });
 
@@ -312,6 +315,9 @@ uploadForm.addEventListener('submit', async (e) => {
     
     // Clear the file input after successful upload
     input.value = '';
+    
+    // Refresh the file list to show the newly uploaded files
+    loadFileList();
   } catch (err) {
     console.error('Upload error', err);
     
@@ -459,4 +465,100 @@ function loadChatHistory(chatId) {
   });
   
   chatBox.scrollTop = chatBox.scrollHeight;
+}
+
+// File list management functions
+async function loadFileList() {
+  if (!currentCaseNumber) {
+    console.warn('No case number available to load files');
+    return;
+  }
+
+  const filesLoading = document.getElementById('filesLoading');
+  const filesEmpty = document.getElementById('filesEmpty');
+  const filesItems = document.getElementById('filesItems');
+
+  // Show loading state
+  filesLoading.style.display = 'flex';
+  filesEmpty.style.display = 'none';
+  filesItems.innerHTML = '';
+
+  try {
+    console.log('Loading file list for case:', currentCaseNumber);
+    const response = await fetch('https://ocdefonblobupload-ffcwb6frd2gnd0f8.westus2-01.azurewebsites.net/api/ListFiles?code=ZeI5vyYITMvYPiyMwU7t33vxG20sgCPQcnv0z684uoabAzFulc6rxg==', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ CaseNumber: currentCaseNumber })
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+
+    const result = await response.json();
+    
+    // Hide loading state
+    filesLoading.style.display = 'none';
+
+    // Check if we have files
+    if (!result || !Array.isArray(result) || result.length === 0) {
+      filesEmpty.style.display = 'block';
+      return;
+    }
+
+    // Display files
+    filesEmpty.style.display = 'none';
+    displayFileList(result);
+
+  } catch (err) {
+    console.error('Error loading file list:', err);
+    
+    // Hide loading state and show error
+    filesLoading.style.display = 'none';
+    filesEmpty.style.display = 'block';
+    filesEmpty.textContent = 'Error loading files. Please try again.';
+    
+    // Reset to default message after 3 seconds
+    setTimeout(() => {
+      filesEmpty.textContent = 'No files uploaded for this case yet.';
+    }, 3000);
+  }
+}
+
+function displayFileList(files) {
+  const filesItems = document.getElementById('filesItems');
+  filesItems.innerHTML = '';
+
+  files.forEach(file => {
+    const fileItem = document.createElement('li');
+    fileItem.className = 'file-item';
+    
+    // Format file size if available
+    const fileSize = file.size ? formatFileSize(file.size) : '';
+    
+    fileItem.innerHTML = `
+      <div class="file-icon">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2V4z"></path>
+          <polyline points="14,2 14,8 8,8"></polyline>
+        </svg>
+      </div>
+      <div class="file-name" title="${file.name || file.fileName || 'Unknown file'}">${file.name || file.fileName || 'Unknown file'}</div>
+      ${fileSize ? `<div class="file-size">${fileSize}</div>` : ''}
+    `;
+    
+    filesItems.appendChild(fileItem);
+  });
+}
+
+function formatFileSize(bytes) {
+  if (bytes === 0) return '0 Bytes';
+  
+  const k = 1024;
+  const sizes = ['Bytes', 'KB', 'MB', 'GB'];
+  const i = Math.floor(Math.log(bytes) / Math.log(k));
+  
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
 }

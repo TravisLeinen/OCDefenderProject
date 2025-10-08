@@ -181,6 +181,121 @@ h1 {
     border-color: #6b7280;
 }
 
+/* Files List Styling */
+.files-section {
+    background: #404040;
+    border-radius: 12px;
+    padding: 16px;
+    margin-bottom: 20px;
+    border: 1px solid #555;
+}
+
+.files-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 12px;
+}
+
+.files-header h3 {
+    color: #ececf1;
+    font-size: 1.1rem;
+    font-weight: 600;
+    margin: 0;
+}
+
+.refresh-files-btn {
+    background: none;
+    border: 1px solid rgba(75, 85, 99, 0.5);
+    border-radius: 6px;
+    color: #d1d5db;
+    padding: 6px 8px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.refresh-files-btn:hover {
+    background: #4a4a4a;
+    border-color: #666;
+}
+
+.files-list {
+    max-height: 200px;
+    overflow-y: auto;
+}
+
+.files-loading {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #9ca3af;
+    font-style: italic;
+    padding: 8px 0;
+}
+
+.loading-spinner {
+    width: 16px;
+    height: 16px;
+    border: 2px solid #374151;
+    border-top: 2px solid #d4af37;
+    border-radius: 50%;
+    animation: spin 1s linear infinite;
+}
+
+.files-empty {
+    color: #9ca3af;
+    font-style: italic;
+    padding: 8px 0;
+    text-align: center;
+}
+
+.files-items {
+    list-style: none;
+    padding: 0;
+    margin: 0;
+}
+
+.file-item {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    background: #343541;
+    border-radius: 8px;
+    margin-bottom: 6px;
+    color: #ececf1;
+    transition: background 0.2s ease;
+}
+
+.file-item:hover {
+    background: #3a3a4a;
+}
+
+.file-icon {
+    color: #d4af37;
+    flex-shrink: 0;
+}
+
+.file-name {
+    flex: 1;
+    font-size: 0.9rem;
+    word-break: break-word;
+}
+
+.file-size {
+    color: #9ca3af;
+    font-size: 0.8rem;
+    flex-shrink: 0;
+}
+
+@keyframes spin {
+    0% { transform: rotate(0deg); }
+    100% { transform: rotate(360deg); }
+}
+
 .chat-input-row {
     display: flex;
     gap: 8px;

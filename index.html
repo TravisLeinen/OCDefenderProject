@@ -64,6 +64,31 @@
             </div>
             
             <h1>Writs and Appeals Assistant</h1>
+            
+            <!-- Files List Section -->
+            <div class="files-section" id="filesSection">
+                <div class="files-header">
+                    <h3>Case Files</h3>
+                    <button type="button" class="refresh-files-btn" onclick="loadFileList()" title="Refresh file list">
+                        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                            <path d="M21.5 2v6h-6M2.5 22v-6h6M2 11.5a10 10 0 0 1 18.8-4.3M22 12.5a10 10 0 0 1-18.8 4.3"/>
+                        </svg>
+                    </button>
+                </div>
+                <div class="files-list" id="filesList">
+                    <div class="files-loading" id="filesLoading" style="display: none;">
+                        <div class="loading-spinner"></div>
+                        Loading files...
+                    </div>
+                    <div class="files-empty" id="filesEmpty">
+                        No files uploaded for this case yet.
+                    </div>
+                    <ul class="files-items" id="filesItems">
+                        <!-- File items will be dynamically added here -->
+                    </ul>
+                </div>
+            </div>
+            
             <div class="chat-box" id="chatBox"></div>
             <form id="chatForm" class="chat-input-row" autocomplete="off">
                 <input type="text" id="chatInput" class="chat-input" placeholder="Type your question..." required />
