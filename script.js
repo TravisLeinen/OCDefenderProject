@@ -485,7 +485,6 @@ async function loadFileList() {
 
   try {
     console.log('Loading file list for case:', currentCaseNumber);
-    console.log(`Using fetch URL: https://ocdefonblobupload-ffcwb6frd2gnd0f8.westus2-01.azurewebsites.net/api/ListFiles?code=ZeI5vyYITMvYPiyMwU7t33vxG20sgCPQcnv0z684uoabAzFulc6rxg==&CaseNumber=${encodeURIComponent(currentCaseNumber)}`);
     const response = await fetch(`https://ocdefonblobupload-ffcwb6frd2gnd0f8.westus2-01.azurewebsites.net/api/ListFiles?code=ZeI5vyYITMvYPiyMwU7t33vxG20sgCPQcnv0z684uoabAzFulc6rxg==&CaseNumber=${encodeURIComponent(currentCaseNumber)}`, {
       method: 'GET',
       headers: {
@@ -502,15 +501,15 @@ async function loadFileList() {
     // Hide loading state
     filesLoading.style.display = 'none';
 
-    // Check if we have files
-    if (!result || !Array.isArray(result) || result.length === 0) {
+    // Check if we have files in the new response format
+    if (!result || !result.fileNames || !Array.isArray(result.fileNames) || result.fileNames.length === 0) {
       filesEmpty.style.display = 'block';
       return;
     }
 
-    // Display files
+    // Display files using the fileNames array
     filesEmpty.style.display = 'none';
-    displayFileList(result);
+    displayFileList(result.fileNames, result.fileCount);
 
   } catch (err) {
     console.error('Error loading file list:', err);
@@ -527,16 +526,18 @@ async function loadFileList() {
   }
 }
 
-function displayFileList(files) {
+function displayFileList(fileNames, fileCount) {
   const filesItems = document.getElementById('filesItems');
   filesItems.innerHTML = '';
 
-  files.forEach(file => {
+  // Show file count if available
+  if (fileCount && fileCount > 0) {
+    console.log(`Displaying ${fileCount} files for case`);
+  }
+
+  fileNames.forEach(fileName => {
     const fileItem = document.createElement('li');
     fileItem.className = 'file-item';
-    
-    // Format file size if available
-    const fileSize = file.size ? formatFileSize(file.size) : '';
     
     fileItem.innerHTML = `
       <div class="file-icon">
@@ -545,8 +546,7 @@ function displayFileList(files) {
           <polyline points="14,2 14,8 8,8"></polyline>
         </svg>
       </div>
-      <div class="file-name" title="${file.name || file.fileName || 'Unknown file'}">${file.name || file.fileName || 'Unknown file'}</div>
-      ${fileSize ? `<div class="file-size">${fileSize}</div>` : ''}
+      <div class="file-name" title="${fileName}">${fileName}</div>
     `;
     
     filesItems.appendChild(fileItem);
