@@ -263,6 +263,9 @@ uploadForm.addEventListener('submit', async (e) => {
     return;
   }
 
+  // Record start time for upload duration tracking
+  const uploadStartTime = Date.now();
+
   const formData = new FormData();
   // Append case number
   formData.append('caseNumber', currentCaseNumber);
@@ -301,6 +304,11 @@ uploadForm.addEventListener('submit', async (e) => {
 
     const result = await response.text();
 
+    // Calculate upload duration
+    const uploadEndTime = Date.now();
+    const uploadDuration = uploadEndTime - uploadStartTime;
+    const formattedDuration = formatUploadDuration(uploadDuration);
+
     // TODO: Handle result failures
     
     // Remove loading message
@@ -309,15 +317,18 @@ uploadForm.addEventListener('submit', async (e) => {
       loadingMsg.closest('.message').remove();
     }
     
-    // Show successful upload message with file list
+    // Show successful upload message with file list and upload time
     const successFileListHtml = fileNames.map(name => `<li style="margin: 2px 0; color: #10b981;">${name}</li>`).join('');
-    appendMessage("System", `<div style="color: #10b981; font-weight: 500;">✅ Successfully uploaded ${files.length} file${files.length > 1 ? 's' : ''}:</div><ul style="margin: 4px 0 0 16px; padding: 0; list-style-type: disc;">${successFileListHtml}</ul>`);
+    appendMessage("System", `<div style="color: #10b981; font-weight: 500;">✅ Successfully uploaded ${files.length} file${files.length > 1 ? 's' : ''} in ${formattedDuration}:</div><ul style="margin: 4px 0 0 16px; padding: 0; list-style-type: disc;">${successFileListHtml}</ul>`);
     
     // Clear the file input after successful upload
     input.value = '';
     
     // Refresh the file list to show the newly uploaded files
     loadFileList();
+    
+    // Start checking indexer status after successful upload
+    startIndexerStatusPolling();
   } catch (err) {
     console.error('Upload error', err);
     
@@ -337,6 +348,162 @@ uploadForm.addEventListener('submit', async (e) => {
     chatInput.disabled = false;
   }
 });
+
+// Helper function to format upload duration in a human-readable way
+function formatUploadDuration(milliseconds) {
+  if (milliseconds < 1000) {
+    return `${milliseconds}ms`;
+  } else if (milliseconds < 60000) {
+    const seconds = (milliseconds / 1000).toFixed(1);
+    return `${seconds}s`;
+  } else {
+    const minutes = Math.floor(milliseconds / 60000);
+    const seconds = Math.floor((milliseconds % 60000) / 1000);
+    return `${minutes}m ${seconds}s`;
+  }
+}
+
+// Azure AI Search Indexer Status Management
+let indexerStatusInterval = null;
+
+async function checkIndexerStatus() {
+  try {
+    // TODO: Replace with actual API endpoint when provided
+    console.log('Checking indexer status...');
+    
+    // Placeholder for actual API call - replace this URL when provided
+    const response = await fetch('https://ocdefonblobupload-ffcwb6frd2gnd0f8.westus2-01.azurewebsites.net/api/PollIndexer?code=LdfbePlBNrVsaLboW5fh1HXLxazkuIUe_vuq_NMY2OwGAzFuabshdw==', {
+      method: 'GET',
+      headers: {
+        'Content-Type': 'application/json'
+      }
+    });
+    
+    if (!response.ok) {
+      throw new Error(`HTTP error! status: ${response.status}`);
+    }
+    
+    const result = await response.json();
+    const status = result.status;
+    
+    updateIndexerStatusDisplay(status);
+    
+    // If status is "in progress", continue polling
+    if (status === 'in progress') {
+      // Continue checking every 3 seconds
+      setTimeout(checkIndexerStatus, 3000);
+    } else {
+      // Status is final (success or error), stop polling
+      clearIndexerStatusPolling();
+    }
+    
+  } catch (err) {
+    console.error('Error checking indexer status:', err);
+    updateIndexerStatusDisplay('error');
+    clearIndexerStatusPolling();
+  }
+}
+
+function updateIndexerStatusDisplay(status) {
+  const indexerStatus = document.getElementById('indexerStatus');
+  const indexerStatusIcon = document.getElementById('indexerStatusIcon');
+  const indexerStatusValue = document.getElementById('indexerStatusValue');
+  
+  if (!indexerStatus || !indexerStatusIcon || !indexerStatusValue) {
+    console.warn('Indexer status elements not found');
+    return;
+  }
+  
+  // Show the status display
+  indexerStatus.style.display = 'block';
+  
+  // Remove all status classes
+  indexerStatus.classList.remove('success', 'error', 'in-progress', 'reset');
+  indexerStatusIcon.classList.remove('spinning');
+  
+  // Update based on status
+  switch (status) {
+    case 'success':
+      indexerStatus.classList.add('success');
+      indexerStatusValue.textContent = 'Completed Successfully';
+      indexerStatusIcon.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
+          <polyline points="22,4 12,14.01 9,11.01"></polyline>
+        </svg>
+      `;
+      break;
+      
+    case 'error':
+      indexerStatus.classList.add('error');
+      indexerStatusValue.textContent = 'Indexing Failed';
+      indexerStatusIcon.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="10"></circle>
+          <line x1="15" y1="9" x2="9" y2="15"></line>
+          <line x1="9" y1="9" x2="15" y2="15"></line>
+        </svg>
+      `;
+      break;
+
+    case 'reset':
+      indexerStatus.classList.add('reset');
+      indexerStatusValue.textContent = 'Ready to Index';
+      indexerStatusIcon.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <circle cx="12" cy="12" r="3"></circle>
+          <circle cx="12" cy="1" r="1"></circle>
+          <circle cx="12" cy="23" r="1"></circle>
+          <circle cx="4.22" cy="4.22" r="1"></circle>
+          <circle cx="19.78" cy="19.78" r="1"></circle>
+          <circle cx="1" cy="12" r="1"></circle>
+          <circle cx="23" cy="12" r="1"></circle>
+          <circle cx="4.22" cy="19.78" r="1"></circle>
+          <circle cx="19.78" cy="4.22" r="1"></circle>
+        </svg>
+      `;
+      break;
+      
+    case 'in progress':
+    default:
+      indexerStatus.classList.add('in-progress');
+      indexerStatusValue.textContent = 'Indexing Documents...';
+      indexerStatusIcon.classList.add('spinning');
+      indexerStatusIcon.innerHTML = `
+        <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+          <path d="M21 12a9 9 0 11-6.219-8.56"></path>
+        </svg>
+      `;
+      break;
+  }
+  
+  console.log('Updated indexer status display:', status);
+}
+
+function startIndexerStatusPolling() {
+  // Clear any existing polling
+  clearIndexerStatusPolling();
+  
+  // Start checking status immediately
+  checkIndexerStatus();
+  
+  console.log('Started indexer status polling');
+}
+
+function clearIndexerStatusPolling() {
+  if (indexerStatusInterval) {
+    clearInterval(indexerStatusInterval);
+    indexerStatusInterval = null;
+  }
+  console.log('Cleared indexer status polling');
+}
+
+function hideIndexerStatus() {
+  const indexerStatus = document.getElementById('indexerStatus');
+  if (indexerStatus) {
+    indexerStatus.style.display = 'none';
+  }
+}
 
 // Chat response appending
 function appendMessage(sender, text) {
