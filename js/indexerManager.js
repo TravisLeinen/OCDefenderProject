@@ -153,27 +153,7 @@ class IndexerManager {
   }
 
   startPolling() {
-    // Clear any existing polling
-    this.stopPolling();
-    
-    // Start checking status immediately
     this.checkStatus();
-    
     console.log('Started indexer status polling');
-  }
-
-  stopPolling() {
-    if (this.pollingInterval) {
-      clearInterval(this.pollingInterval);
-      this.pollingInterval = null;
-    }
-    console.log('Cleared indexer status polling');
-  }
-
-  hide() {
-    const indexerStatus = document.getElementById('indexerStatus');
-    if (indexerStatus) {
-      indexerStatus.style.display = 'none';
-    }
   }
 }
