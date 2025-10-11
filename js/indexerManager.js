@@ -2,7 +2,6 @@
 
 class IndexerManager {
   constructor() {
-    this.pollingInterval = null;
   }
 
   showLoadingState() {
@@ -57,22 +56,12 @@ class IndexerManager {
       
       // If status is "in progress", continue polling
       if (status === 'in progress') {
-        // Continue checking every 3 seconds
-        setTimeout(() => this.checkStatus(), 3000);
-      } else {
-        // Status is final, stop polling after 5 seconds
-        setTimeout(() => {
-          this.stopPolling();
-        }, 5000);
+        this.checkStatus();
       }
       
     } catch (err) {
       console.error('Error checking indexer status:', err);
       this.updateStatusDisplay('error');
-      // Stop polling on error after 5 seconds
-      setTimeout(() => {
-        this.stopPolling();
-      }, 5000);
     }
   }
 
@@ -96,6 +85,7 @@ class IndexerManager {
     // Update based on status
     switch (status) {
       case 'success':
+        console.log("Success??");
         indexerStatus.classList.add('success');
         indexerStatusValue.textContent = 'Completed Successfully';
         indexerStatusIcon.innerHTML = `
