@@ -56,12 +56,12 @@ class FileUploadManager {
       // Clear the file input after successful upload
       input.value = '';
       
-      // Refresh the file list and start indexer polling
+      // Refresh the file list and start indexer polling with delay
       if (window.fileManager) {
         window.fileManager.loadFileList();
       }
       if (window.indexerManager) {
-        window.indexerManager.startPolling();
+        window.indexerManager.startPollingAfterUpload();
       }
 
     } catch (err) {

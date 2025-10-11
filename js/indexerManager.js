@@ -34,6 +34,36 @@ class IndexerManager {
     console.log('Showing indexer status loading state');
   }
 
+  showPreparingState() {
+    const indexerStatus = document.getElementById('indexerStatus');
+    const indexerStatusIcon = document.getElementById('indexerStatusIcon');
+    const indexerStatusValue = document.getElementById('indexerStatusValue');
+    
+    if (!indexerStatus || !indexerStatusIcon || !indexerStatusValue) {
+      console.warn('Indexer status elements not found');
+      return;
+    }
+    
+    // Show the status display with preparing state
+    indexerStatus.style.display = 'block';
+    
+    // Remove all status classes
+    indexerStatus.classList.remove('success', 'error', 'in-progress', 'reset', 'loading');
+    indexerStatusIcon.classList.remove('spinning');
+    
+    // Add preparing state (similar to in-progress but different message)
+    indexerStatus.classList.add('in-progress');
+    indexerStatusIcon.classList.add('spinning');
+    indexerStatusValue.textContent = 'Preparing to Index...';
+    indexerStatusIcon.innerHTML = `
+      <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 12a9 9 0 11-6.219-8.56"></path>
+      </svg>
+    `;
+    
+    console.log('Showing indexer preparing state');
+  }
+
   async checkStatus() {
     try {
       console.log('Checking indexer status...');
@@ -54,14 +84,14 @@ class IndexerManager {
       
       this.updateStatusDisplay(status);
       
-      // If status is "in progress", continue polling
-      if (status === 'in progress') {
-        this.checkStatus();
+      // If status is "InProgress", continue polling after 3 seconds
+      if (status === 'InProgress') {
+        setTimeout(() => this.checkStatus(), 3000);
       }
       
     } catch (err) {
       console.error('Error checking indexer status:', err);
-      this.updateStatusDisplay('error');
+      this.updateStatusDisplay('TransientFailure');
     }
   }
 
@@ -144,5 +174,18 @@ class IndexerManager {
   startPolling() {
     this.checkStatus();
     console.log('Started indexer status polling');
+  }
+
+  startPollingAfterUpload() {
+    // Show immediate preparing state
+    this.showPreparingState();
+    
+    // Wait 5 seconds before starting to poll the actual status
+    setTimeout(() => {
+      console.log('Starting delayed indexer status polling after upload...');
+      this.checkStatus();
+    }, 5000);
+    
+    console.log('Started indexer status polling with 5-second delay for upload');
   }
 }

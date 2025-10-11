@@ -103,8 +103,9 @@ class CaseManager {
     console.log('New Session ID:', window.sessionId);
     
     // Hide indexer status during case switch
-    if (this.indexerManager) {
-      this.indexerManager.hide();
+    const indexerStatus = document.getElementById('indexerStatus');
+    if (indexerStatus) {
+      indexerStatus.style.display = 'none';
     }
     
     // Reset UI
