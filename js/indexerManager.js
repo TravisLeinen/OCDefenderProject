@@ -84,8 +84,7 @@ class IndexerManager {
     
     // Update based on status
     switch (status) {
-      case 'success':
-        console.log("Success??");
+      case 'Success':
         indexerStatus.classList.add('success');
         indexerStatusValue.textContent = 'Completed Successfully';
         indexerStatusIcon.innerHTML = `
@@ -96,7 +95,7 @@ class IndexerManager {
         `;
         break;
         
-      case 'error':
+      case 'TransientFailure':
         indexerStatus.classList.add('error');
         indexerStatusValue.textContent = 'Indexing Failed';
         indexerStatusIcon.innerHTML = `
@@ -108,7 +107,7 @@ class IndexerManager {
         `;
         break;
 
-      case 'reset':
+      case 'Reset':
         indexerStatus.classList.add('reset');
         indexerStatusValue.textContent = 'Ready to Index';
         indexerStatusIcon.innerHTML = `
@@ -125,8 +124,8 @@ class IndexerManager {
           </svg>
         `;
         break;
-        
-      case 'in progress':
+
+      case 'InProgress':
       default:
         indexerStatus.classList.add('in-progress');
         indexerStatusValue.textContent = 'Indexing Documents...';
