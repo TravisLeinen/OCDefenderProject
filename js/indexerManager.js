@@ -107,7 +107,7 @@ class IndexerManager {
       
       const result = await response.json();
       const status = result.status;
-      const elapsedTime = result.ElapsedTime;
+      const elapsedTime = result.elapsedTime;
       
       this.updateStatusDisplay(status, elapsedTime);
       
@@ -202,7 +202,7 @@ class IndexerManager {
     }
     
     const formattedTimeForLog = this.formatElapsedTime(elapsedTime);
-    console.log('Updated indexer status display 1:', status, formattedTimeForLog ? `(${formattedTimeForLog})` : '');
+    console.log('Updated indexer status display:', status, formattedTimeForLog ? `(${formattedTimeForLog})` : '');
   }
 
   startPolling() {
