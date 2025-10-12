@@ -202,7 +202,7 @@ class IndexerManager {
     }
     
     const formattedTimeForLog = this.formatElapsedTime(elapsedTime);
-    console.log('Updated indexer status display:', status, formattedTimeForLog ? `(${formattedTimeForLog})` : '');
+    console.log('Updated indexer status display 1:', status, formattedTimeForLog ? `(${formattedTimeForLog})` : '');
   }
 
   startPolling() {
