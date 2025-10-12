@@ -6,28 +6,61 @@ class IndexerManager {
 
   // Helper function to format elapsed time into human-readable format
   formatElapsedTime(elapsedTime) {
-    if (!elapsedTime || elapsedTime <= 0) return null;
+    if (!elapsedTime) return null;
     
-    // Convert milliseconds to total seconds
-    const totalSeconds = Math.floor(elapsedTime / 1000);
-    
-    // Convert to human-readable format
-    if (totalSeconds < 60) {
-      return `${totalSeconds}s`;
-    } else if (totalSeconds < 3600) {
-      const minutes = Math.floor(totalSeconds / 60);
-      const seconds = totalSeconds % 60;
-      return seconds > 0 ? `${minutes}m ${seconds}s` : `${minutes}m`;
-    } else {
-      const hours = Math.floor(totalSeconds / 3600);
-      const minutes = Math.floor((totalSeconds % 3600) / 60);
-      const seconds = totalSeconds % 60;
-      
-      let result = `${hours}h`;
-      if (minutes > 0) result += ` ${minutes}m`;
-      if (seconds > 0) result += ` ${seconds}s`;
-      return result;
+    // Handle .NET TimeSpan format (HH:MM:SS.fffffff)
+    if (typeof elapsedTime === 'string' && elapsedTime.includes(':')) {
+      // Parse the TimeSpan format "00:01:17.6190000"
+      const parts = elapsedTime.split(':');
+      if (parts.length >= 3) {
+        const hours = parseInt(parts[0], 10);
+        const minutes = parseInt(parts[1], 10);
+        const secondsParts = parts[2].split('.');
+        const seconds = parseInt(secondsParts[0], 10);
+        
+        // Build human-readable format
+        let result = '';
+        
+        if (hours > 0) {
+          result += `${hours}h`;
+        }
+        
+        if (minutes > 0) {
+          result += (result ? ' ' : '') + `${minutes}m`;
+        }
+        
+        if (seconds > 0 || (hours === 0 && minutes === 0)) {
+          result += (result ? ' ' : '') + `${seconds}s`;
+        }
+        
+        return result || '0s';
+      }
     }
+    
+    // Fallback: if it's a number, assume milliseconds
+    if (typeof elapsedTime === 'number' || !isNaN(elapsedTime)) {
+      const totalSeconds = Math.floor(Number(elapsedTime) / 1000);
+      
+      if (totalSeconds < 60) {
+        return `${totalSeconds}s`;
+      } else if (totalSeconds < 3600) {
+        const minutes = Math.floor(totalSeconds / 60);
+        const seconds = totalSeconds % 60;
+        return seconds > 0 ? `${minutes}m ${seconds}s` : `${minutes}m`;
+      } else {
+        const hours = Math.floor(totalSeconds / 3600);
+        const minutes = Math.floor((totalSeconds % 3600) / 60);
+        const seconds = totalSeconds % 60;
+        
+        let result = `${hours}h`;
+        if (minutes > 0) result += ` ${minutes}m`;
+        if (seconds > 0) result += ` ${seconds}s`;
+        return result;
+      }
+    }
+    
+    // Return as-is if we can't parse it
+    return elapsedTime.toString();
   }
 
   showLoadingState() {
