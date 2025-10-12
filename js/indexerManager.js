@@ -4,6 +4,32 @@ class IndexerManager {
   constructor() {
   }
 
+  // Helper function to format elapsed time into human-readable format
+  formatElapsedTime(elapsedTime) {
+    if (!elapsedTime || elapsedTime <= 0) return null;
+    
+    // Convert milliseconds to total seconds
+    const totalSeconds = Math.floor(elapsedTime / 1000);
+    
+    // Convert to human-readable format
+    if (totalSeconds < 60) {
+      return `${totalSeconds}s`;
+    } else if (totalSeconds < 3600) {
+      const minutes = Math.floor(totalSeconds / 60);
+      const seconds = totalSeconds % 60;
+      return seconds > 0 ? `${minutes}m ${seconds}s` : `${minutes}m`;
+    } else {
+      const hours = Math.floor(totalSeconds / 3600);
+      const minutes = Math.floor((totalSeconds % 3600) / 60);
+      const seconds = totalSeconds % 60;
+      
+      let result = `${hours}h`;
+      if (minutes > 0) result += ` ${minutes}m`;
+      if (seconds > 0) result += ` ${seconds}s`;
+      return result;
+    }
+  }
+
   showLoadingState() {
     const indexerStatus = document.getElementById('indexerStatus');
     const indexerStatusIcon = document.getElementById('indexerStatusIcon');
@@ -81,8 +107,9 @@ class IndexerManager {
       
       const result = await response.json();
       const status = result.status;
+      const elapsedTime = result.ElapsedTime;
       
-      this.updateStatusDisplay(status);
+      this.updateStatusDisplay(status, elapsedTime);
       
       // If status is "InProgress", continue polling after 3 seconds
       if (status === 'InProgress') {
@@ -95,7 +122,7 @@ class IndexerManager {
     }
   }
 
-  updateStatusDisplay(status) {
+  updateStatusDisplay(status, elapsedTime = null) {
     const indexerStatus = document.getElementById('indexerStatus');
     const indexerStatusIcon = document.getElementById('indexerStatusIcon');
     const indexerStatusValue = document.getElementById('indexerStatusValue');
@@ -116,7 +143,13 @@ class IndexerManager {
     switch (status) {
       case 'Success':
         indexerStatus.classList.add('success');
-        indexerStatusValue.textContent = 'Completed Successfully';
+        // Include elapsed time if available, formatted for readability
+        const formattedTime = this.formatElapsedTime(elapsedTime);
+        if (formattedTime) {
+          indexerStatusValue.textContent = `Indexing completed in (${formattedTime})`;
+        } else {
+          indexerStatusValue.textContent = 'Indexing completed successfully';
+        }
         indexerStatusIcon.innerHTML = `
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <path d="M22 11.08V12a10 10 0 1 1-5.93-9.14"></path>
@@ -127,7 +160,7 @@ class IndexerManager {
         
       case 'TransientFailure':
         indexerStatus.classList.add('error');
-        indexerStatusValue.textContent = 'Indexing Failed';
+        indexerStatusValue.textContent = 'Indexing Failed, some files may not be accessible to the assistant';
         indexerStatusIcon.innerHTML = `
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="10"></circle>
@@ -139,7 +172,7 @@ class IndexerManager {
 
       case 'Reset':
         indexerStatus.classList.add('reset');
-        indexerStatusValue.textContent = 'Ready to Index';
+        indexerStatusValue.textContent = 'Upload a file to start the indexer for the assistant!';
         indexerStatusIcon.innerHTML = `
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
             <circle cx="12" cy="12" r="3"></circle>
@@ -158,7 +191,7 @@ class IndexerManager {
       case 'InProgress':
       default:
         indexerStatus.classList.add('in-progress');
-        indexerStatusValue.textContent = 'Indexing Documents...';
+        indexerStatusValue.textContent = 'Indexing documents, some files may not be reachable until this completes';
         indexerStatusIcon.classList.add('spinning');
         indexerStatusIcon.innerHTML = `
           <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -168,7 +201,8 @@ class IndexerManager {
         break;
     }
     
-    console.log('Updated indexer status display:', status);
+    const formattedTimeForLog = this.formatElapsedTime(elapsedTime);
+    console.log('Updated indexer status display:', status, formattedTimeForLog ? `(${formattedTimeForLog})` : '');
   }
 
   startPolling() {
