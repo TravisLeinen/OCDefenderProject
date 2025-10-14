@@ -1,0 +1,86 @@
+/* Chat tabs styling */
+
+.chat-tabs {
+  margin-bottom: 20px;
+}
+
+.chat-tabs-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: var(--spacing-md);
+}
+
+.chat-tabs-list {
+  display: flex;
+  gap: var(--spacing-md);
+  flex-wrap: wrap;
+  max-width: calc(100% - 120px);
+}
+
+.chat-tab {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+  padding: var(--spacing-md) var(--spacing-lg);
+  background: var(--bg-tertiary);
+  border: 1px solid var(--border-secondary);
+  border-radius: var(--radius-md);
+  color: var(--text-secondary);
+  cursor: pointer;
+  transition: var(--transition-fast);
+  font-size: 0.9rem;
+  white-space: nowrap;
+}
+
+.chat-tab:hover {
+  background: #4a4a4a;
+  border-color: #666;
+}
+
+.chat-tab.active {
+  background: var(--accent-gold);
+  color: var(--text-dark);
+  border-color: var(--accent-gold);
+  font-weight: 600;
+}
+
+.chat-tab-close {
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  padding: 2px;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
+  transition: var(--transition-fast);
+}
+
+.chat-tab-close:hover {
+  opacity: 1;
+}
+
+.new-chat-btn {
+  background: #374151;
+  color: #f9fafb;
+  border: 1px solid rgba(75, 85, 99, 0.5);
+  border-radius: var(--radius-md);
+  padding: var(--spacing-md) 12px;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition-smooth);
+  display: flex;
+  align-items: center;
+  gap: 6px;
+}
+
+.new-chat-btn:hover {
+  background: #4b5563;
+  border-color: #6b7280;
+}

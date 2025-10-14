@@ -1,0 +1,89 @@
+/* Indexer status styles */
+
+.indexer-status {
+  background: var(--bg-tertiary);
+  border-radius: var(--radius-lg);
+  padding: var(--spacing-lg);
+  margin-bottom: var(--spacing-lg);
+  border: 1px solid var(--border-secondary);
+  transition: var(--transition-fast);
+}
+
+.indexer-status-content {
+  display: flex;
+  align-items: center;
+  gap: var(--spacing-md);
+}
+
+.indexer-status-icon {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  flex-shrink: 0;
+}
+
+.indexer-status-text {
+  flex: 1;
+}
+
+.indexer-status-label {
+  display: block;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  font-weight: 600;
+  margin-bottom: 2px;
+}
+
+.indexer-status-value {
+  display: block;
+  color: var(--text-primary);
+  font-size: 0.95rem;
+}
+
+/* Status-specific styling */
+.indexer-status.success {
+  background: rgba(56, 161, 105, 0.1);
+  border-color: rgba(56, 161, 105, 0.3);
+}
+
+.indexer-status.success .indexer-status-icon {
+  color: var(--accent-green);
+}
+
+.indexer-status.error {
+  background: rgba(229, 62, 62, 0.1);
+  border-color: rgba(229, 62, 62, 0.3);
+}
+
+.indexer-status.error .indexer-status-icon {
+  color: var(--accent-red);
+}
+
+.indexer-status.in-progress {
+  background: rgba(212, 175, 55, 0.1);
+  border-color: rgba(212, 175, 55, 0.3);
+}
+
+.indexer-status.in-progress .indexer-status-icon {
+  color: var(--accent-gold);
+}
+
+.indexer-status.reset {
+  background: rgba(113, 128, 150, 0.1);
+  border-color: rgba(113, 128, 150, 0.3);
+}
+
+.indexer-status.reset .indexer-status-icon {
+  color: var(--text-secondary);
+}
+
+.indexer-status.loading {
+  background: rgba(120, 113, 208, 0.1);
+  border-color: rgba(120, 113, 208, 0.3);
+}
+
+.indexer-status.loading .indexer-status-icon {
+  color: #7871d0;
+}

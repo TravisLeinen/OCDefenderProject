@@ -1,0 +1,79 @@
+/* Main CSS file - imports all modules */
+
+@import url('base.css');
+@import url('auth.css');
+@import url('case-entry.css');
+@import url('chat.css');
+@import url('tabs.css');
+@import url('files.css');
+@import url('indexer.css');
+
+/* Additional responsive styles */
+@media (max-width: 768px) {
+  .container {
+    margin: 20px;
+    padding: 20px 16px 16px 16px;
+  }
+  
+  .case-entry-container {
+    margin: 20px;
+    padding: 2rem 1.5rem;
+  }
+  
+  .login-container {
+    margin: 20px;
+    padding: 2rem 1.5rem;
+  }
+  
+  .chat-tabs-list {
+    max-width: 100%;
+  }
+  
+  .chat-tabs-header {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: stretch;
+  }
+  
+  .files-header {
+    flex-direction: column;
+    gap: var(--spacing-sm);
+    align-items: stretch;
+  }
+  
+  .upload-form {
+    flex-direction: column;
+  }
+  
+  .case-info {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: stretch;
+  }
+  
+  .user-info {
+    flex-direction: column;
+    gap: var(--spacing-md);
+    align-items: stretch;
+  }
+}
+
+@media (max-width: 480px) {
+  .case-entry-title {
+    font-size: 2rem;
+  }
+  
+  .login-title {
+    font-size: 1.75rem;
+  }
+  
+  h1 {
+    font-size: 1.8rem;
+  }
+  
+  .bubble {
+    max-width: 95%;
+    font-size: 1rem;
+    padding: 12px 16px;
+  }
+}
