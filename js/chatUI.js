@@ -50,7 +50,8 @@ class ChatUI {
         }),
         headers: {
           'Content-Type': 'application/json'
-        }
+        },
+        credentials: 'include'
       });
 
       const result = await response.text();
