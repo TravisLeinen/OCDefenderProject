@@ -127,7 +127,7 @@ class IndexerManager {
     try {
       console.log('Checking indexer status...');
       
-      const response = await fetch('https://ocdefonblobupload-ffcwb6frd2gnd0f8.westus2-01.azurewebsites.net/api/PollIndexer?code=LdfbePlBNrVsaLboW5fh1HXLxazkuIUe_vuq_NMY2OwGAzFuabshdw==', {
+      const response = await fetch('https://fa-alexz1008-testprivate-gvh4fuajf0drb4hu.westus2-01.azurewebsites.net/api/PollIndexer?code=iVa_nhmJZi00FYvKC3r561_jCRjwLDNJK9KLjT82LUjzAzFuADXsFQ==', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
