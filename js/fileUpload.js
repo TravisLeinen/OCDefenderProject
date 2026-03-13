@@ -39,7 +39,7 @@ class FileUploadManager {
 
     try {
       console.log('Uploading files...');
-      const response = await fetch('https://ocdefonblobupload-ffcwb6frd2gnd0f8.westus2-01.azurewebsites.net/api/UploadPDF?code=dc4riUFRUGw4j0b0W2V1J-JivxH-iPresSi49yoMryNlAzFuumATfg==', {
+      const response = await fetch('https://legalassist-functionapp.azurewebsites.us/api/UploadPDF?code=aNgeuJvh24BRkcVfjHDEWgDxSqnrEKsrwDooYUiyffezAzFunlJByg==', {
         method: 'POST',
         body: formData
       });
