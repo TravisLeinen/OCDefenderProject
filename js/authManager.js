@@ -1,33 +1,33 @@
-// Azure Static Web Apps Authentication Manager
+// Azure Web App User Info Manager (Authentication handled by Azure)
 
 class AuthManager {
   constructor() {
     this.user = null;
-    this.isAuthenticated = false;
   }
 
-  async checkAuthStatus() {
+  async loadUserInfo() {
     try {
-      // Azure Static Web Apps provides user info at /.auth/me
+      // Azure Web Apps provides user info at /.auth/me
       const response = await fetch('/.auth/me');
+      
+      if (!response.ok) {
+        console.warn('Could not load user info');
+        return null;
+      }
+      
       const payload = await response.json();
       
-      if (payload && payload.clientPrincipal) {
-        this.user = payload.clientPrincipal;
-        this.isAuthenticated = true;
-        console.log('User authenticated:', this.user);
-        return true;
-      } else {
-        this.user = null;
-        this.isAuthenticated = false;
-        console.log('User not authenticated');
-        return false;
+      // Azure Web App returns an array of user info
+      if (payload && Array.isArray(payload) && payload.length > 0) {
+        this.user = payload[0];
+        console.log('User info loaded:', this.user);
+        return this.user;
       }
+      
+      return null;
     } catch (error) {
-      console.error('Error checking authentication status:', error);
-      this.user = null;
-      this.isAuthenticated = false;
-      return false;
+      console.error('Error loading user info:', error);
+      return null;
     }
   }
 
@@ -35,52 +35,136 @@ class AuthManager {
     return this.user;
   }
 
-  isUserAuthenticated() {
-    return this.isAuthenticated;
-  }
-
   getUserDisplayName() {
-    if (!this.user) return 'Unknown User';
-    return this.user.userDetails || this.user.userId || 'User';
+    if (!this.user) return 'User';
+    
+    if (this.user.user_claims) {
+      const nameClaim = this.user.user_claims.find(claim => 
+        claim.typ === 'name' || 
+        claim.typ === 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name' ||
+        claim.typ === 'preferred_username'
+      );
+      if (nameClaim) return nameClaim.val;
+      
+      const emailClaim = this.user.user_claims.find(claim => 
+        claim.typ === 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress' ||
+        claim.typ === 'email' ||
+        claim.typ === 'emails'
+      );
+      if (emailClaim) return emailClaim.val;
+    }
+    
+    return this.user.user_id || 'User';
   }
 
   getUserProvider() {
     if (!this.user) return null;
-    return this.user.identityProvider;
+    return this.user.provider_name || this.user.identity_provider;
   }
 
-  // Redirect to login - Azure Static Web Apps handles this
-  redirectToLogin(provider = 'aad') {
-    // Available providers: aad (Azure AD), github, twitter, google, facebook
-    window.location.href = `/.auth/login/${provider}`;
+  getUserId() {
+    if (!this.user) return null;
+    return this.user.user_id;
   }
 
-  // Redirect to logout
-  redirectToLogout() {
-    window.location.href = '/.auth/logout';
-  }
-
-  showLoginScreen() {
-    const loginScreen = document.getElementById('loginScreen');
-    const caseEntryScreen = document.getElementById('caseEntryScreen');
-    const mainApp = document.getElementById('mainApp');
+  getUserEmail() {
+    if (!this.user) return null;
     
-    if (loginScreen) {
-      loginScreen.style.display = 'flex';
+    if (this.user.user_claims) {
+      const emailClaim = this.user.user_claims.find(claim => 
+        claim.typ === 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress' ||
+        claim.typ === 'email' ||
+        claim.typ === 'emails'
+      );
+      if (emailClaim) return emailClaim.val;
     }
-    if (caseEntryScreen) {
-      caseEntryScreen.style.display = 'none';
-    }
-    if (mainApp) {
-      mainApp.style.display = 'none';
-    }
+    
+    return null;
   }
 
-  hideLoginScreen() {
-    const loginScreen = document.getElementById('loginScreen');
-    if (loginScreen) {
-      loginScreen.style.display = 'none';
+  getUserFullName() {
+    if (!this.user) return null;
+    
+    if (this.user.user_claims) {
+      const nameClaim = this.user.user_claims.find(claim => 
+        claim.typ === 'name' ||
+        claim.typ === 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/name'
+      );
+      if (nameClaim) return nameClaim.val;
+      
+      const givenNameClaim = this.user.user_claims.find(claim => 
+        claim.typ === 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname' ||
+        claim.typ === 'given_name'
+      );
+      const surnameClaim = this.user.user_claims.find(claim => 
+        claim.typ === 'http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname' ||
+        claim.typ === 'family_name'
+      );
+      
+      if (givenNameClaim && surnameClaim) {
+        return `${givenNameClaim.val} ${surnameClaim.val}`;
+      }
+      if (givenNameClaim) return givenNameClaim.val;
+      if (surnameClaim) return surnameClaim.val;
     }
+    
+    return this.getUserDisplayName();
+  }
+
+  getUserRoles() {
+    if (!this.user) return [];
+    
+    if (this.user.user_claims) {
+      const roleClaims = this.user.user_claims.filter(claim => 
+        claim.typ === 'roles' ||
+        claim.typ === 'http://schemas.microsoft.com/ws/2008/06/identity/claims/role'
+      );
+      return roleClaims.map(claim => claim.val);
+    }
+    
+    return [];
+  }
+
+  hasRole(role) {
+    const roles = this.getUserRoles();
+    return roles.includes(role);
+  }
+
+  getClaim(claimType) {
+    if (!this.user || !this.user.user_claims) return null;
+    
+    const claim = this.user.user_claims.find(c => 
+      c.typ === claimType || 
+      c.typ.endsWith(`/${claimType}`)
+    );
+    
+    return claim ? claim.val : null;
+  }
+
+  getUserTrackingInfo() {
+    if (!this.user) return null;
+    
+    return {
+      userId: this.getUserId(),
+      email: this.getUserEmail(),
+      displayName: this.getUserDisplayName(),
+      fullName: this.getUserFullName(),
+      provider: this.getUserProvider(),
+      roles: this.getUserRoles(),
+      timestamp: new Date().toISOString()
+    };
+  }
+
+  createUserContext() {
+    const trackingInfo = this.getUserTrackingInfo();
+    if (!trackingInfo) return null;
+    
+    return {
+      user: trackingInfo,
+      sessionId: window.sessionId || generateSessionId(),
+      userAgent: navigator.userAgent,
+      timestamp: new Date().toISOString()
+    };
   }
 
   updateUserInfo() {
