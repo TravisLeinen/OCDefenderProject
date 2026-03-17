@@ -127,7 +127,7 @@ class IndexerManager {
     try {
       console.log('Checking indexer status...');
       
-      const response = await fetch('https://fa-alexz1008-testprivate-gvh4fuajf0drb4hu.westus2-01.azurewebsites.net/api/PollIndexer?code=iVa_nhmJZi00FYvKC3r561_jCRjwLDNJK9KLjT82LUjzAzFuADXsFQ==', {
+      const response = await fetch('https://legalassist-functionapp.azurewebsites.us/api/PollIndexer?code=dgLsfH9XPCUfo29KEs50GXkvrOvYmycqMvCuJceEfE3kAzFug72RCQ==', {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'

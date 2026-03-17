@@ -41,7 +41,7 @@ class ChatUI {
 
     try {
       console.log('Sending chat...');
-      const response = await fetch('https://fa-alexz1008-testprivate-gvh4fuajf0drb4hu.westus2-01.azurewebsites.net/api/SubmitChat?code=Ey2qkuKY2FZKdaaeHyetKMvwVNV8RMt3qoi3NEieSdNIAzFusPLGxA==', {
+      const response = await fetch('https://legalassist-functionapp.azurewebsites.us/api/SubmitChat?code=t-tHmONIlMIW63CwiTHCTWJsMhsVt1LEM48hNoj4x9jUAzFu9Zc_1w==', {
         method: 'POST',
         body: JSON.stringify({ 
           Message: message, 

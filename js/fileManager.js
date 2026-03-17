@@ -22,7 +22,7 @@ class FileManager {
 
     try {
       console.log('Loading file list for case:', window.currentCaseNumber);
-      const response = await fetch(`https://ocdefonblobupload-ffcwb6frd2gnd0f8.westus2-01.azurewebsites.net/api/ListFiles?code=ZeI5vyYITMvYPiyMwU7t33vxG20sgCPQcnv0z684uoabAzFulc6rxg==&CaseNumber=${encodeURIComponent(window.currentCaseNumber)}`, {
+      const response = await fetch(`https://legalassist-functionapp.azurewebsites.us/api/ListFiles?code=8BZvGUg8fcHm_lgi9UPofy_RhqO_sHKAjQra9F7f50m4AzFu-2xssg==&CaseNumber=${encodeURIComponent(window.currentCaseNumber)}`, {
         method: 'GET',
         headers: {
           'Content-Type': 'application/json'
