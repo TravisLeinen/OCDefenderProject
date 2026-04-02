@@ -8,25 +8,45 @@ class AuthManager {
   async loadUserInfo() {
     try {
       // Azure Web Apps provides user info at /.auth/me
+      console.debug('[Auth] Fetching /.auth/me ...');
       const response = await fetch('/.auth/me');
+      console.debug('[Auth] /.auth/me response status:', response.status);
       
       if (!response.ok) {
-        console.warn('Could not load user info');
+        console.warn('[Auth] /.auth/me returned non-OK status:', response.status);
         return null;
       }
       
       const payload = await response.json();
+      console.debug('[Auth] /.auth/me payload:', JSON.stringify(payload));
       
-      // Azure Web App returns an array of user info
+      // Azure App Service returns an array: [{provider_name, user_id, user_claims, ...}]
       if (payload && Array.isArray(payload) && payload.length > 0) {
         this.user = payload[0];
-        console.log('User info loaded:', this.user);
+        console.debug('[Auth] Parsed user from array format:', this.user);
         return this.user;
       }
       
+      // Azure Static Web Apps returns: {clientPrincipal: {identityProvider, userId, userDetails, userRoles, claims}}
+      if (payload && payload.clientPrincipal) {
+        const cp = payload.clientPrincipal;
+        console.debug('[Auth] Parsed clientPrincipal:', cp);
+        // Normalize to a common shape so getter methods work
+        this.user = {
+          provider_name: cp.identityProvider,
+          user_id: cp.userId,
+          user_claims: (cp.claims || []).map(c => ({ typ: c.typ, val: c.val })),
+          user_details: cp.userDetails,
+          user_roles: cp.userRoles || []
+        };
+        console.debug('[Auth] Normalized user object:', this.user);
+        return this.user;
+      }
+      
+      console.warn('[Auth] /.auth/me payload did not match expected formats. Payload:', payload);
       return null;
     } catch (error) {
-      console.error('Error loading user info:', error);
+      console.error('[Auth] Error loading user info:', error);
       return null;
     }
   }
@@ -181,5 +201,54 @@ class AuthManager {
         userProviderElement.textContent = `via ${provider.toUpperCase()}`;
       }
     }
+  }
+
+  // Easy Auth: check if user is authenticated via /.auth/me
+  async checkAuthStatus() {
+    console.debug('[Auth] checkAuthStatus called');
+    const user = await this.loadUserInfo();
+    console.debug('[Auth] checkAuthStatus result:', user !== null);
+    return user !== null;
+  }
+
+  // Show the login screen and hide everything else
+  showLoginScreen() {
+    console.debug('[Auth] showLoginScreen called');
+    const loginScreen = document.getElementById('loginScreen');
+    const caseEntryScreen = document.getElementById('caseEntryScreen');
+    const mainApp = document.getElementById('mainApp');
+
+    console.debug('[Auth] loginScreen element:', loginScreen);
+    console.debug('[Auth] caseEntryScreen element:', caseEntryScreen);
+    console.debug('[Auth] mainApp element:', mainApp);
+
+    if (loginScreen) loginScreen.style.display = 'flex';
+    if (caseEntryScreen) caseEntryScreen.style.display = 'none';
+    if (mainApp) mainApp.style.display = 'none';
+  }
+
+  // Hide the login screen
+  hideLoginScreen() {
+    console.debug('[Auth] hideLoginScreen called');
+    const loginScreen = document.getElementById('loginScreen');
+    if (loginScreen) {
+      console.debug('[Auth] Hiding login screen, current display:', loginScreen.style.display);
+      loginScreen.style.display = 'none';
+    }
+  }
+
+  // Redirect to Azure Easy Auth login endpoint
+  redirectToLogin(provider) {
+    const allowedProviders = ['aad', 'github', 'google', 'twitter', 'facebook'];
+    if (!allowedProviders.includes(provider)) {
+      console.error('Invalid auth provider:', provider);
+      return;
+    }
+    window.location.href = `/.auth/login/${encodeURIComponent(provider)}`;
+  }
+
+  // Redirect to Azure Easy Auth logout endpoint
+  redirectToLogout() {
+    window.location.href = '/.auth/logout';
   }
 }
